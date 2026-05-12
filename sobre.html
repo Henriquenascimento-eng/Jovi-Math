@@ -37,5 +37,129 @@
         <h1 class="sobre-title">JOVI <span class="brand-accent">Math</span></h1>
         <p class="sobre-subtitle">Resolução inteligente de equações pela câmera do seu celular</p>
       </section>
+
+      <!-- O que é o JOVI Math -->
+      <section class="sobre-section" aria-labelledby="about-heading">
+        <h2 class="section-heading" id="about-heading">O que é?</h2>
+        <p class="section-text">
+          O <strong>JOVI Math</strong> é uma funcionalidade nativa de câmera impulsionada pela IA <strong>Gemini</strong>.
+          Usando OCR (Reconhecimento Ótico de Caracteres), ele lê equações matemáticas diretamente do seu caderno e
+          retorna um painel completo com a resolução passo a passo — para você entender o "porquê", não só a resposta.
+        </p>
+      </section>
+
+      <!-- ===== SLIDESHOW / CARROSSEL ===== -->
+      <section class="sobre-section slideshow-section" aria-labelledby="howto-heading">
+        <h2 class="section-heading" id="howto-heading">Como funciona</h2>
+
+        <div class="slideshow-container" role="region" aria-label="Como usar o JOVI Math">
+
+          <!-- Track das slides -->
+          <div class="slideshow-track" id="slideshow-track" aria-live="polite">
+
+            <!-- Slide 1 -->
+            <div class="slide" role="group" aria-label="Passo 1 de 5">
+              <div class="slide-visual slide-visual--camera">
+                <div class="slide-phone-mock">
+                  <div class="mock-screen dark">
+                    <div class="mock-mode-bar">
+                      <span>VÍDEO</span>
+                      <span class="mock-active">FOTO</span>
+                      <span>MATH</span>
+                    </div>
+                    <div class="mock-capture-btn"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-content">
+                <span class="slide-step-badge">01</span>
+                <h3 class="slide-title">Abra a câmera</h3>
+                <p class="slide-desc">Abra a câmera nativa do seu celular. Não é necessário baixar nenhum aplicativo extra.</p>
+              </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide" role="group" aria-label="Passo 2 de 5">
+              <div class="slide-visual slide-visual--swipe">
+                <div class="slide-phone-mock">
+                  <div class="mock-screen dark">
+                    <div class="mock-mode-bar">
+                      <span>FOTO</span>
+                      <span class="mock-active mock-math">MATH ✦</span>
+                      <span>RETRATO</span>
+                    </div>
+                    <div class="mock-capture-btn mock-capture-btn--blue"></div>
+                  </div>
+                </div>
+                <div class="slide-swipe-hint" aria-hidden="true">← deslize →</div>
+              </div>
+              <div class="slide-content">
+                <span class="slide-step-badge">02</span>
+                <h3 class="slide-title">Selecione o modo MATH</h3>
+                <p class="slide-desc">Deslize o menu inferior da câmera de "FOTO" para o modo <strong>MATH</strong>. O botão de captura ficará azul.</p>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide" role="group" aria-label="Passo 3 de 5">
+              <div class="slide-visual slide-visual--scan">
+                <div class="slide-phone-mock">
+                  <div class="mock-screen dark">
+                    <div class="mock-scanner-frame">
+                      <div class="mock-corner tl"></div>
+                      <div class="mock-corner tr"></div>
+                      <div class="mock-corner bl"></div>
+                      <div class="mock-corner br"></div>
+                      <div class="mock-scan-label">x² − 5x + 6 = 0</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-content">
+                <span class="slide-step-badge">03</span>
+                <h3 class="slide-title">Aponte para a equação</h3>
+                <p class="slide-desc">Enquadre a equação do caderno no scanner. A IA reconhece a escrita à mão automaticamente.</p>
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide" role="group" aria-label="Passo 4 de 5">
+              <div class="slide-visual slide-visual--capture">
+                <div class="slide-phone-mock">
+                  <div class="mock-screen dark">
+                    <div class="mock-eq-badge">x² − 5x + 6 = 0</div>
+                    <div class="mock-capture-btn mock-capture-btn--blue mock-pulse"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-content">
+                <span class="slide-step-badge">04</span>
+                <h3 class="slide-title">Clique em Resolver</h3>
+                <p class="slide-desc">Pressione o botão azul. O Gemini irá processar a equação e preparar a resolução completa.</p>
+              </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide" role="group" aria-label="Passo 5 de 5">
+              <div class="slide-visual slide-visual--result">
+                <div class="slide-phone-mock">
+                  <div class="mock-screen dark">
+                    <div class="mock-bottom-sheet">
+                      <div class="mock-sheet-line mock-sheet-line--wide"></div>
+                      <div class="mock-sheet-line"></div>
+                      <div class="mock-sheet-line mock-sheet-line--med"></div>
+                      <div class="mock-sheet-btn">S = {2, 3}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-content">
+                <span class="slide-step-badge">05</span>
+                <h3 class="slide-title">Veja o passo a passo</h3>
+                <p class="slide-desc">Um painel sobe da parte inferior com a resolução completa, da fórmula ao resultado final.</p>
+              </div>
+            </div>
+
+          </div><!-- /slideshow-track -->
 </body>
 </html>
