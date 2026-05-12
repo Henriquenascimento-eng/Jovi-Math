@@ -161,5 +161,74 @@
             </div>
 
           </div><!-- /slideshow-track -->
+
+          <!-- Controles do carrossel -->
+          <div class="slideshow-controls">
+            <button class="slide-btn" id="btn-prev" aria-label="Passo anterior">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+
+            <!-- Dots de paginação -->
+            <div class="slideshow-dots" id="slideshow-dots" role="tablist" aria-label="Slides">
+              <button class="dot active" data-index="0" role="tab" aria-selected="true" aria-label="Passo 1"></button>
+              <button class="dot" data-index="1" role="tab" aria-selected="false" aria-label="Passo 2"></button>
+              <button class="dot" data-index="2" role="tab" aria-selected="false" aria-label="Passo 3"></button>
+              <button class="dot" data-index="3" role="tab" aria-selected="false" aria-label="Passo 4"></button>
+              <button class="dot" data-index="4" role="tab" aria-selected="false" aria-label="Passo 5"></button>
+            </div>
+
+            <button class="slide-btn" id="btn-next" aria-label="Próximo passo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <!-- Contador textual -->
+          <p class="slideshow-counter" id="slideshow-counter" aria-live="polite">Passo 1 de 5</p>
+
+        </div><!-- /slideshow-container -->
+      </section>
+
+      <!-- Tecnologias -->
+      <section class="sobre-section" aria-labelledby="tech-heading">
+        <h2 class="section-heading" id="tech-heading">Tecnologias</h2>
+        <ul class="tech-list" role="list">
+          <li class="tech-item">
+            <span class="tech-icon">🤖</span>
+            <div><strong>Gemini AI</strong><br/><small>Processamento de linguagem e resolução</small></div>
+          </li>
+          <li class="tech-item">
+            <span class="tech-icon">📷</span>
+            <div><strong>OCR Nativo</strong><br/><small>Leitura de escrita à mão</small></div>
+          </li>
+          <li class="tech-item">
+            <span class="tech-icon">⚡</span>
+            <div><strong>Vanilla JS</strong><br/><small>Leve, rápido, sem dependências</small></div>
+          </li>
+        </ul>
+      </section>
+
+      <div class="sobre-spacer"></div>
+
+    </div><!-- /page-scroll-content -->
+
+    <!-- Barra de navegação inferior -->
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <a href="index.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+        <span>Câmera</span>
+      </a>
+      <a href="sobre.html" class="nav-item active" aria-current="page">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8h.01M12 12v4"/></svg>
+        <span>Sobre</span>
+      </a>
+      <a href="equipe.html" class="nav-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Equipe</span>
+      </a>
+    </nav>
+
+  </div><!-- /phone-frame -->
+
+  <script src="script.js"></script>
 </body>
 </html>
