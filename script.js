@@ -1,565 +1,517 @@
-/**
- * ============================================================
- *  JOVI Math — script.js
- *  Sprint 2 · Grupo F.D.P. · FIAP 2026
- *  Vanilla JavaScript puro — zero frameworks, zero jQuery
- *
- *  Módulos:
- *    1. Utils              — helpers reutilizáveis
- *    2. Clock              — relógio ao vivo na status bar
- *    3. Login              — validação de formulário + localStorage
- *    4. Greeting           — saudação personalizada via localStorage
- *    5. CameraMode         — troca de abas da câmera (DOM events)
- *    6. BottomSheet        — abrir / fechar painel de resolução
- *    7. CopyButton         — copiar solução + alert()
- *    8. Settings Prompt    — prompt() de configuração
- *    9. Slideshow          — carrossel de imagens na página Sobre
- *   10. Init               — bootstrap por página
- * ============================================================
- */
+// ==========================================================
+// JOVI Math - script.js
+// Código organizado em módulos simples
+// ==========================================================
 
 'use strict';
 
-/* ============================================================
-   1. UTILS — funções auxiliares genéricas
-   ============================================================ */
+// ==========================================================
+// Helpers
+// ==========================================================
 
-/**
- * Seleciona um elemento do DOM de forma segura.
- * @param {string} selector - Seletor CSS
- * @param {Element} [ctx=document] - Contexto de busca
- * @returns {Element|null}
- */
-const $ = (selector, ctx = document) => ctx.querySelector(selector);
+// Atalho para pegar elemento
+const $ = (selector) => document.querySelector(selector);
 
-/**
- * Seleciona múltiplos elementos do DOM.
- * @param {string} selector
- * @param {Element} [ctx=document]
- * @returns {NodeList}
- */
-const $$ = (selector, ctx = document) => ctx.querySelectorAll(selector);
+// Atalho para pegar vários elementos
+const $$ = (selector) => document.querySelectorAll(selector);
 
-/**
- * Capitaliza a primeira letra de uma string e coloca o restante em minúscula.
- * Rubrica: Manipulação de Strings e Variáveis ✅
- * @param {string} str
- * @returns {string}
- */
-const capitalizeName = (str) => {
-  if (!str || typeof str !== 'string') return '';
-  const trimmed = str.trim();
-  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
-};
+// Deixa a primeira letra maiúscula
+function formatarNome(nome) {
+  if (!nome) return '';
 
-/**
- * Valida formato básico de e-mail com RegExp.
- * @param {string} email
- * @returns {boolean}
- */
-const isValidEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email.trim());
-};
+  nome = nome.trim();
 
+  return nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
+}
 
-/* ============================================================
-   2. CLOCK — relógio ao vivo na status bar
-   ============================================================ */
+// Validação simples de e-mail
+function emailValido(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email.trim());
+}
 
-/**
- * Inicializa o relógio da status bar e atualiza a cada minuto.
- */
-const initClock = () => {
-  const clockEl = $('#status-time');
-  if (!clockEl) return;
+// ==========================================================
+// Relógio
+// ==========================================================
 
-  const updateTime = () => {
-    const now  = new Date();
-    const hh   = now.getHours().toString().padStart(2, '0');
-    const mm   = now.getMinutes().toString().padStart(2, '0');
-    // Template Literal — Rubrica: Manipulação de Strings ✅
-    clockEl.textContent = `${hh}:${mm}`;
-  };
+function iniciarRelogio() {
+  const relogio = $('#status-time');
 
-  updateTime();
-  setInterval(updateTime, 60_000);
-};
+  if (!relogio) return;
 
+  function atualizarHora() {
+    const agora = new Date();
 
-/* ============================================================
-   3. LOGIN — validação de formulário e redirecionamento
-   Rubrica: Validação de formulários e login ✅
-   Rubrica: localStorage ✅
-   Rubrica: alert() para erros ✅
-   ============================================================ */
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
 
-/**
- * Exibe ou limpa a mensagem de erro de um campo.
- * @param {string} inputId    - ID do <input>
- * @param {string} errorId    - ID do <span> de erro
- * @param {string} [msg='']   - Mensagem de erro (vazio = limpa)
- */
-const setFieldError = (inputId, errorId, msg = '') => {
+    relogio.textContent = `${horas}:${minutos}`;
+  }
+
+  atualizarHora();
+
+  setInterval(atualizarHora, 60000);
+}
+
+// ==========================================================
+// Login
+// ==========================================================
+
+function mostrarErro(inputId, erroId, mensagem = '') {
   const input = $(`#${inputId}`);
-  const error = $(`#${errorId}`);
-  if (!input || !error) return;
+  const erro = $(`#${erroId}`);
 
-  if (msg) {
+  if (!input || !erro) return;
+
+  if (mensagem) {
     input.classList.add('error');
-    error.textContent = msg;
+    erro.textContent = mensagem;
   } else {
     input.classList.remove('error');
-    error.textContent = '';
+    erro.textContent = '';
   }
-};
+}
 
-/**
- * Valida e processa o formulário de login.
- * @param {Event} e
- */
-const handleLoginSubmit = (e) => {
-  e.preventDefault();
+function fazerLogin(event) {
+  event.preventDefault();
 
-  const emailInput    = $('#email');
-  const passwordInput = $('#password');
-  const usernameInput = $('#username');
+  const email = $('#email').value;
+  const senha = $('#password').value;
+  const usuario = $('#username').value;
 
-  // Lê os valores dos campos
-  const emailVal    = emailInput?.value    ?? '';
-  const passwordVal = passwordInput?.value ?? '';
-  const usernameVal = usernameInput?.value ?? '';
+  let temErro = false;
 
-  let hasError = false;
+  // Validação do e-mail
+  if (!email.trim()) {
+    mostrarErro('email', 'email-error', 'Digite seu e-mail.');
+    temErro = true;
 
-  // — Validação: e-mail vazio
-  if (!emailVal.trim()) {
-    setFieldError('email', 'email-error', 'O e-mail é obrigatório.');
-    hasError = true;
-  // — Validação: formato de e-mail
-  } else if (!isValidEmail(emailVal)) {
-    setFieldError('email', 'email-error', 'Digite um e-mail válido (ex: lucas@fiap.com.br).');
-    hasError = true;
+  } else if (!emailValido(email)) {
+    mostrarErro('email', 'email-error', 'E-mail inválido.');
+    temErro = true;
+
   } else {
-    setFieldError('email', 'email-error');
+    mostrarErro('email', 'email-error');
   }
 
-  // — Validação: senha vazia
-  if (!passwordVal.trim()) {
-    setFieldError('password', 'password-error', 'A senha não pode ser vazia.');
-    hasError = true;
-  } else if (passwordVal.length < 4) {
-    setFieldError('password', 'password-error', 'Senha muito curta (mínimo 4 caracteres).');
-    hasError = true;
+  // Validação da senha
+  if (!senha.trim()) {
+    mostrarErro('password', 'password-error', 'Digite sua senha.');
+    temErro = true;
+
+  } else if (senha.length < 4) {
+    mostrarErro('password', 'password-error', 'Senha muito curta.');
+    temErro = true;
+
   } else {
-    setFieldError('password', 'password-error');
+    mostrarErro('password', 'password-error');
   }
 
-  // Se houver erro, mostra um alert() — Rubrica: Alertas ✅
-  if (hasError) {
-    alert('⚠️ Por favor, corrija os campos destacados antes de continuar.');
+  // Se tiver erro, para aqui
+  if (temErro) {
+    alert('⚠️ Corrija os campos antes de continuar.');
     return;
   }
 
-  // Login válido — salva o nome no localStorage — Rubrica: localStorage ✅
-  const nomeFinal = capitalizeName(usernameVal) || capitalizeName(emailVal.split('@')[0]);
-  localStorage.setItem('jovi_user_name', nomeFinal);
+  // Salva nome do usuário
+  const nome =
+    formatarNome(usuario) ||
+    formatarNome(email.split('@')[0]);
 
-  // Redireciona para o simulador
+  localStorage.setItem('jovi_user_name', nome);
+
+  // Vai para a home
   window.location.href = 'index.html';
-};
+}
 
-/**
- * Alterna visibilidade da senha.
- */
-const initTogglePassword = () => {
-  const toggleBtn   = $('#toggle-password');
-  const passwordInput = $('#password');
-  if (!toggleBtn || !passwordInput) return;
+// Mostrar / esconder senha
+function iniciarToggleSenha() {
+  const botao = $('#toggle-password');
+  const inputSenha = $('#password');
 
-  toggleBtn.addEventListener('click', () => {
-    const isHidden = passwordInput.type === 'password';
-    passwordInput.type = isHidden ? 'text' : 'password';
-    toggleBtn.setAttribute('aria-label', isHidden ? 'Ocultar senha' : 'Mostrar senha');
+  if (!botao || !inputSenha) return;
+
+  botao.addEventListener('click', () => {
+
+    if (inputSenha.type === 'password') {
+      inputSenha.type = 'text';
+      botao.setAttribute('aria-label', 'Ocultar senha');
+
+    } else {
+      inputSenha.type = 'password';
+      botao.setAttribute('aria-label', 'Mostrar senha');
+    }
   });
-};
+}
 
-/**
- * Inicializa a página de login.
- */
-const initLogin = () => {
+function iniciarLogin() {
   const form = $('#login-form');
+
   if (!form) return;
 
-  form.addEventListener('submit', handleLoginSubmit);
-  initTogglePassword();
-};
+  form.addEventListener('submit', fazerLogin);
 
+  iniciarToggleSenha();
+}
 
-/* ============================================================
-   4. GREETING — saudação personalizada com nome do localStorage
-   Rubrica: Manipulação de Strings + DOM ✅
-   ============================================================ */
+// ==========================================================
+// Saudação
+// ==========================================================
 
-/**
- * Injeta saudação personalizada no DOM usando o nome salvo.
- */
-const initGreeting = () => {
-  const greetingEl = $('#greeting-text');
-  if (!greetingEl) return;
+function iniciarSaudacao() {
+  const texto = $('#greeting-text');
 
-  // Recupera o nome do localStorage
-  const storedName = localStorage.getItem('jovi_user_name');
+  if (!texto) return;
 
-  if (storedName) {
-    // Template Literal + capitalização — Rubrica: Strings ✅
-    const saudacao = `Olá, ${capitalizeName(storedName)}, bem-vindo ao JOVI Math!`;
-    greetingEl.textContent = saudacao;
+  const nomeSalvo = localStorage.getItem('jovi_user_name');
+
+  if (nomeSalvo) {
+    texto.textContent =
+      `Olá, ${formatarNome(nomeSalvo)}, bem-vindo ao JOVI Math!`;
+
   } else {
-    greetingEl.textContent = 'Bem-vindo ao JOVI Math! 📐';
+    texto.textContent = 'Bem-vindo ao JOVI Math! 📐';
   }
-};
+}
 
+// ==========================================================
+// Modos da câmera
+// ==========================================================
 
-/* ============================================================
-   5. CAMERA MODE — troca de modos via addEventListener
-   Rubrica: Manipulação dinâmica de DOM e Eventos ✅
-   Sem nenhum input[type="radio"] escondido — apenas JS puro
-   ============================================================ */
+function iniciarCamera() {
 
-/**
- * Controla as abas da câmera, o viewfinder e a aparência
- * do botão de captura ao mudar de modo.
- */
-const initCameraMode = () => {
-  const modeButtons   = $$('[data-mode]');
-  const captureBtn    = $('#btn-capture');
-  const viewfinder    = $('#camera-viewfinder');
-  const scannerOverlay = $('#scanner-overlay');
-  const equationCard  = $('#equation-card');
-  const cameraModeTitle = $('#camera-mode-title');
+  const botoesModo = $$('[data-mode]');
+  const viewfinder = $('#camera-viewfinder');
+  const overlay = $('#scanner-overlay');
+  const card = $('#equation-card');
+  const titulo = $('#camera-mode-title');
 
-  if (!modeButtons.length) return;
+  if (!botoesModo.length) return;
 
-  // Mapa de rótulos para cada modo
-  const modeTitles = {
-    video:    'VÍDEO',
-    photo:    'FOTO',
-    math:     'MATH',
-    portrait: 'RETRATO',
+  const nomes = {
+    video: 'VÍDEO',
+    photo: 'FOTO',
+    math: 'MATH',
+    portrait: 'RETRATO'
   };
 
-  /**
-   * Ativa o modo de câmera selecionado.
-   * @param {string} mode - 'video' | 'photo' | 'math' | 'portrait'
-   */
-  const activateMode = (mode) => {
-    // Atualiza aria-selected em todos os botões de modo
-    modeButtons.forEach((btn) => {
-      const isSelected = btn.dataset.mode === mode;
-      btn.setAttribute('aria-selected', String(isSelected));
+  function ativarModo(modo) {
+
+    botoesModo.forEach((botao) => {
+
+      const ativo = botao.dataset.mode === modo;
+
+      botao.setAttribute('aria-selected', ativo);
     });
 
-    // Atualiza o título da câmera — Template Literal ✅
-    if (cameraModeTitle) {
-      cameraModeTitle.textContent = modeTitles[mode] ?? mode.toUpperCase();
+    if (titulo) {
+      titulo.textContent = nomes[modo];
     }
 
-    // Ativa/desativa elementos visuais do modo MATH
-    const isMath = mode === 'math';
+    const modoMath = modo === 'math';
 
-    viewfinder?.classList.toggle('math-mode', isMath);
-    scannerOverlay?.classList.toggle('active', isMath);
-    equationCard?.classList.toggle('active', isMath);
-  };
+    viewfinder?.classList.toggle('math-mode', modoMath);
+    overlay?.classList.toggle('active', modoMath);
+    card?.classList.toggle('active', modoMath);
+  }
 
-  // Adiciona listener em cada botão de modo — Rubrica: addEventListener ✅
-  modeButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const selectedMode = btn.dataset.mode;
-      activateMode(selectedMode);
+  botoesModo.forEach((botao) => {
+
+    botao.addEventListener('click', () => {
+
+      const modo = botao.dataset.mode;
+
+      ativarModo(modo);
     });
   });
 
-  // Estado inicial: modo 'photo'
-  activateMode('photo');
-};
+  ativarModo('photo');
+}
 
+// ==========================================================
+// Bottom Sheet
+// ==========================================================
 
-/* ============================================================
-   6. BOTTOM SHEET — abrir e fechar o painel de resolução
-   Rubrica: Manipulação de DOM e Eventos ✅
-   ============================================================ */
+function iniciarBottomSheet() {
 
-/**
- * Controla a abertura e fechamento do Bottom Sheet.
- */
-const initBottomSheet = () => {
-  const bottomSheet  = $('#bottom-sheet');
-  const captureBtn   = $('#btn-capture');
-  const closeBtn     = $('#btn-close-sheet');
-  const overlay      = $('#sheet-overlay');
-  const newScanBtn   = $('#btn-new-scan');
-  const viewfinder   = $('#camera-viewfinder');
+  const sheet = $('#bottom-sheet');
+  const botaoCaptura = $('#btn-capture');
+  const botaoFechar = $('#btn-close-sheet');
+  const overlay = $('#sheet-overlay');
+  const novoScan = $('#btn-new-scan');
+  const viewfinder = $('#camera-viewfinder');
 
-  if (!bottomSheet) return;
+  if (!sheet) return;
 
-  /**
-   * Abre o Bottom Sheet.
-   */
-  const openSheet = () => {
-    // Só abre se estiver no modo Math
-    if (!viewfinder?.classList.contains('math-mode')) return;
+  function abrirSheet() {
 
-    bottomSheet.classList.add('show');
-    bottomSheet.setAttribute('aria-hidden', 'false');
+    // Só abre no modo math
+    if (!viewfinder.classList.contains('math-mode')) return;
 
-    // Foca o botão de fechar para acessibilidade
-    setTimeout(() => closeBtn?.focus(), 400);
-  };
+    sheet.classList.add('show');
+    sheet.setAttribute('aria-hidden', 'false');
 
-  /**
-   * Fecha o Bottom Sheet.
-   */
-  const closeSheet = () => {
-    bottomSheet.classList.remove('show');
-    bottomSheet.setAttribute('aria-hidden', 'true');
-    captureBtn?.focus();
-  };
+    setTimeout(() => {
+      botaoFechar.focus();
+    }, 400);
+  }
 
-  // Listeners de abertura/fechamento — Rubrica: addEventListener ✅
-  captureBtn?.addEventListener('click', openSheet);
-  closeBtn?.addEventListener('click', closeSheet);
-  overlay?.addEventListener('click', closeSheet);
-  newScanBtn?.addEventListener('click', closeSheet);
+  function fecharSheet() {
+    sheet.classList.remove('show');
+    sheet.setAttribute('aria-hidden', 'true');
 
-  // Fecha com a tecla Escape (acessibilidade)
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && bottomSheet.classList.contains('show')) {
-      closeSheet();
+    botaoCaptura.focus();
+  }
+
+  botaoCaptura?.addEventListener('click', abrirSheet);
+  botaoFechar?.addEventListener('click', fecharSheet);
+  overlay?.addEventListener('click', fecharSheet);
+  novoScan?.addEventListener('click', fecharSheet);
+
+  document.addEventListener('keydown', (event) => {
+
+    if (
+      event.key === 'Escape' &&
+      sheet.classList.contains('show')
+    ) {
+      fecharSheet();
     }
   });
-};
+}
 
+// ==========================================================
+// Botão copiar
+// ==========================================================
 
-/* ============================================================
-   7. COPY BUTTON — copia a solução e exibe alert()
-   Rubrica: alert() ✅
-   ============================================================ */
+function iniciarBotaoCopiar() {
 
-/**
- * Copia o texto da resolução e mostra confirmação via alert().
- */
-const initCopyButton = () => {
-  const copyBtn = $('#btn-copy');
-  if (!copyBtn) return;
+  const botao = $('#btn-copy');
 
-  copyBtn.addEventListener('click', () => {
-    // Texto da solução a ser copiado
-    const solution = `JOVI Math — Resolução de x² − 5x + 6 = 0
-Passo 1: Coeficientes → a=1, b=-5, c=6
-Passo 2: Δ = b² - 4ac = 25 - 24 = 1
-Passo 3: x = (-b ± √Δ) / 2a = (5 ± 1) / 2
-Passo 4: x₁ = 3  |  x₂ = 2
-Resultado: S = {2, 3}`;
+  if (!botao) return;
 
-    // Tenta copiar via Clipboard API, com fallback
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(solution)
-        .then(() => alert('✅ Solução copiada com sucesso!'))
-        .catch(() => alert('Não foi possível copiar automaticamente. Selecione e copie manualmente.'));
+  botao.addEventListener('click', () => {
+
+    const resolucao = `
+JOVI Math — Resolução de x² − 5x + 6 = 0
+
+Passo 1:
+a = 1
+b = -5
+c = 6
+
+Passo 2:
+Δ = b² - 4ac
+Δ = 25 - 24
+Δ = 1
+
+Passo 3:
+x = (-b ± √Δ) / 2a
+
+Passo 4:
+x1 = 3
+x2 = 2
+
+Resultado:
+S = {2, 3}
+`;
+
+    if (navigator.clipboard) {
+
+      navigator.clipboard.writeText(resolucao)
+        .then(() => {
+          alert('✅ Solução copiada!');
+        })
+        .catch(() => {
+          alert('Erro ao copiar.');
+        });
+
     } else {
-      // Fallback para navegadores sem Clipboard API
-      alert('✅ Solução copiada com sucesso!\n\n' + solution);
+
+      alert(resolucao);
     }
   });
-};
+}
 
+// ==========================================================
+// Configurações
+// ==========================================================
 
-/* ============================================================
-   8. SETTINGS PROMPT — coleta dados via prompt()
-   Rubrica: prompt() ✅
-   Rubrica: Manipulação de Strings ✅
-   ============================================================ */
+function iniciarConfiguracoes() {
 
-/**
- * Abre um prompt() ao clicar no botão de configurações e
- * injeta o nome personalizado no DOM.
- */
-const initSettingsPrompt = () => {
-  const settingsBtn = $('#btn-settings');
-  const greetingEl  = $('#greeting-text');
-  if (!settingsBtn) return;
+  const botao = $('#btn-settings');
+  const saudacao = $('#greeting-text');
 
-  settingsBtn.addEventListener('click', () => {
-    // Rubrica: prompt() ✅
-    const resposta = prompt('⚙️ JOVI Math — Configurações\n\nQual é o seu nome?');
+  if (!botao) return;
 
-    // Cancela sem fazer nada se o usuário fechar o diálogo
-    if (resposta === null) return;
+  botao.addEventListener('click', () => {
 
-    if (!resposta.trim()) {
-      alert('⚠️ Nenhum nome foi digitado. Tente novamente.');
+    const nome = prompt('Qual é o seu nome?');
+
+    if (nome === null) return;
+
+    if (!nome.trim()) {
+      alert('⚠️ Digite um nome válido.');
       return;
     }
 
-    // Manipula a string — Rubrica: Strings ✅
-    const nome = capitalizeName(resposta);
+    const nomeFormatado = formatarNome(nome);
 
-    // Salva no localStorage — Rubrica: localStorage ✅
-    localStorage.setItem('jovi_user_name', nome);
+    localStorage.setItem('jovi_user_name', nomeFormatado);
 
-    // Injeta no DOM — Template Literal ✅
-    if (greetingEl) {
-      greetingEl.textContent = `Olá, ${nome}, bem-vindo ao JOVI Math!`;
+    if (saudacao) {
+      saudacao.textContent =
+        `Olá, ${nomeFormatado}, bem-vindo ao JOVI Math!`;
     }
 
-    alert(`✅ Nome atualizado para: ${nome}`);
+    alert(`✅ Nome atualizado para ${nomeFormatado}`);
   });
-};
+}
 
+// ==========================================================
+// Slideshow
+// ==========================================================
 
-/* ============================================================
-   9. SLIDESHOW — carrossel de imagens / slides
-   Rubrica: Manipulação de imagens (Slideshow) ✅
-   Rubrica: Array de imagens controlado por JS ✅
-   ============================================================ */
+function iniciarSlideshow() {
 
-/**
- * Inicializa o slideshow da página Sobre.
- * Usa um array de configurações de slide e manipula o DOM
- * via addEventListener nos botões de navegar.
- */
-const initSlideshow = () => {
-  const track   = $('#slideshow-track');
-  const prevBtn = $('#btn-prev');
-  const nextBtn = $('#btn-next');
+  const track = $('#slideshow-track');
+  const prev = $('#btn-prev');
+  const next = $('#btn-next');
   const dotsContainer = $('#slideshow-dots');
-  const counter = $('#slideshow-counter');
+  const contador = $('#slideshow-counter');
 
   if (!track) return;
 
-  // Array de slides — Rubrica: Array de imagens ✅
   const slides = Array.from($$('.slide', track));
-  const totalSlides = slides.length;
 
-  // Estado atual do carrossel
-  let currentIndex = 0;
+  let slideAtual = 0;
 
-  /**
-   * Move o carrossel para o slide indicado.
-   * @param {number} index - Índice do slide destino
-   */
-  const goToSlide = (index) => {
-    // Garante que o índice fique dentro dos limites
-    const clampedIndex = Math.max(0, Math.min(index, totalSlides - 1));
+  function mudarSlide(indice) {
 
-    // Aplica a transformação CSS em todos os slides
+    if (indice < 0) indice = 0;
+    if (indice >= slides.length) indice = slides.length - 1;
+
     slides.forEach((slide, i) => {
-      // Template Literal para construir o translateX — Rubrica: Template Literals ✅
-      slide.style.transform = `translateX(${(i - clampedIndex) * 100}%)`;
+
+      slide.style.transform =
+        `translateX(${(i - indice) * 100}%)`;
     });
 
-    // Atualiza os dots de paginação
     const dots = $$('.dot', dotsContainer);
+
     dots.forEach((dot, i) => {
-      const isActive = i === clampedIndex;
-      dot.classList.toggle('active', isActive);
-      dot.setAttribute('aria-selected', String(isActive));
+
+      const ativo = i === indice;
+
+      dot.classList.toggle('active', ativo);
+      dot.setAttribute('aria-selected', ativo);
     });
 
-    // Atualiza o contador textual — Template Literal ✅
-    if (counter) {
-      counter.textContent = `Passo ${clampedIndex + 1} de ${totalSlides}`;
+    if (contador) {
+      contador.textContent =
+        `Passo ${indice + 1} de ${slides.length}`;
     }
 
-    // Habilita/desabilita botões de navegação nas extremidades
-    if (prevBtn) prevBtn.disabled = clampedIndex === 0;
-    if (nextBtn) nextBtn.disabled = clampedIndex === totalSlides - 1;
+    prev.disabled = indice === 0;
+    next.disabled = indice === slides.length - 1;
 
-    currentIndex = clampedIndex;
-  };
+    slideAtual = indice;
+  }
 
-  // Listener: botão Anterior — Rubrica: addEventListener ✅
-  prevBtn?.addEventListener('click', () => goToSlide(currentIndex - 1));
+  prev?.addEventListener('click', () => {
+    mudarSlide(slideAtual - 1);
+  });
 
-  // Listener: botão Próximo — Rubrica: addEventListener ✅
-  nextBtn?.addEventListener('click', () => goToSlide(currentIndex + 1));
+  next?.addEventListener('click', () => {
+    mudarSlide(slideAtual + 1);
+  });
 
-  // Listeners: dots de paginação
   const dots = $$('.dot', dotsContainer);
+
   dots.forEach((dot) => {
+
     dot.addEventListener('click', () => {
-      const idx = parseInt(dot.dataset.index, 10);
-      goToSlide(idx);
+
+      const indice = Number(dot.dataset.index);
+
+      mudarSlide(indice);
     });
   });
 
-  // Suporte a gestos de swipe no mobile
-  let touchStartX = 0;
+  // Swipe no celular
+  let inicioTouch = 0;
 
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-  }, { passive: true });
-
-  track.addEventListener('touchend', (e) => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      goToSlide(diff > 0 ? currentIndex + 1 : currentIndex - 1);
-    }
-  }, { passive: true });
-
-  // Suporte a teclas de seta (acessibilidade)
-  document.addEventListener('keydown', (e) => {
-    if (!track) return;
-    if (e.key === 'ArrowLeft')  goToSlide(currentIndex - 1);
-    if (e.key === 'ArrowRight') goToSlide(currentIndex + 1);
+  track.addEventListener('touchstart', (event) => {
+    inicioTouch = event.touches[0].clientX;
   });
 
-  // Estado inicial
-  goToSlide(0);
-};
+  track.addEventListener('touchend', (event) => {
 
+    const fimTouch = event.changedTouches[0].clientX;
 
-/* ============================================================
-   10. INIT — bootstrap por página (detecta qual página é)
-   ============================================================ */
+    const distancia = inicioTouch - fimTouch;
 
-/**
- * Detecta a página atual pelo pathname e inicializa
- * apenas os módulos relevantes para ela.
- */
-const initApp = () => {
-  // Relógio sempre roda (todas as páginas têm status bar)
-  initClock();
+    if (Math.abs(distancia) > 40) {
 
-  const path = window.location.pathname.toLowerCase();
+      if (distancia > 0) {
+        mudarSlide(slideAtual + 1);
+      } else {
+        mudarSlide(slideAtual - 1);
+      }
+    }
+  });
 
-  // — Página de Login
-  if (path.includes('login')) {
-    initLogin();
-    return; // login não precisa dos outros módulos
-  }
+  // Teclado
+  document.addEventListener('keydown', (event) => {
 
-  // — Página principal (simulador de câmera)
-  if (path.includes('index') || path === '/' || path.endsWith('/')) {
-    initGreeting();
-    initCameraMode();
-    initBottomSheet();
-    initCopyButton();
-    initSettingsPrompt();
+    if (event.key === 'ArrowLeft') {
+      mudarSlide(slideAtual - 1);
+    }
+
+    if (event.key === 'ArrowRight') {
+      mudarSlide(slideAtual + 1);
+    }
+  });
+
+  mudarSlide(0);
+}
+
+// ==========================================================
+// Inicialização geral
+// ==========================================================
+
+function iniciarApp() {
+
+  iniciarRelogio();
+
+  const pagina = window.location.pathname.toLowerCase();
+
+  // Página login
+  if (pagina.includes('login')) {
+    iniciarLogin();
     return;
   }
 
-  // — Página Sobre (tem slideshow)
-  if (path.includes('sobre')) {
-    initSlideshow();
+  // Página principal
+  if (
+    pagina.includes('index') ||
+    pagina === '/' ||
+    pagina.endsWith('/')
+  ) {
+
+    iniciarSaudacao();
+    iniciarCamera();
+    iniciarBottomSheet();
+    iniciarBotaoCopiar();
+    iniciarConfiguracoes();
+
     return;
   }
 
-  // — Página Equipe (sem módulos específicos de JS)
-  // path.includes('equipe') → nada a inicializar além do clock
-};
+  // Página sobre
+  if (pagina.includes('sobre')) {
+    iniciarSlideshow();
+  }
+}
 
-// Aguarda o DOM estar pronto antes de iniciar
-document.addEventListener('DOMContentLoaded', initApp);
+// Espera carregar HTML
+document.addEventListener('DOMContentLoaded', iniciarApp);
