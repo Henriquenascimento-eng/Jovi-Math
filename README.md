@@ -8,10 +8,10 @@
 
 | Nome | RM | Função |
 |---|---|---|
-| Andrey Luigi | RM569575 | Front-End Developer |
-| Henrique da Silva | RM569137 | UI/UX Designer |
-| Gabriel Juarez | RM563680 | Back-End Developer |
-| Nicolas Marçal | RM565982 | Full-Stack Developer |
+| Andrey Luigi | RM569575 | 
+| Henrique da Silva | RM569137 | 
+| Gabriel Juarez | RM563680 | 
+| Nicolas Marçal | RM565982 |
 
 **Instituição:** FIAP — Faculdade de Informática e Administração Paulista  
 **Disciplina:** Web Development  
