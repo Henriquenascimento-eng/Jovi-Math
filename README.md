@@ -6,8 +6,8 @@
 
 ## 👥 Equipe — Grupo F.D.P.
 
-| Nome | RM | Função |
-|---|---|---|
+| Nome | RM | 
+|---|---|
 | Andrey Luigi | RM569575 | 
 | Henrique da Silva | RM569137 | 
 | Gabriel Juarez | RM563680 | 
